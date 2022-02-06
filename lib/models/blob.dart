@@ -2,7 +2,7 @@
 // it has a convenience method to draw into a canvas.
 // and a tick method to advance the ControlPoints
 
-import 'dart:html';
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
