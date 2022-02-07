@@ -14,6 +14,17 @@ class PuzzleNotifier extends StateNotifier<PuzzleData> {
     state = PuzzleData.copy(state);
   }
 
+  void setHasFocus(bool focussed) {
+    state.hasFocus = focussed;
+    forceUpdate();
+  }
+
+  void setFocusLocation(Point<int> focusLocation) {
+    print("setting focus location to $focusLocation");
+    state.focusLocation = focusLocation;
+    forceUpdate();
+  }
+
   void setSpaceLocation(Point<int> spaceLocation) {
     state.spaceLocation = spaceLocation;
     forceUpdate();

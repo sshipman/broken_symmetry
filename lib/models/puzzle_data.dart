@@ -7,12 +7,16 @@ class PuzzleData {
   double cellSize;
   List<SlideTileData> slideTiles;
   Point<int> spaceLocation;
+  Point<int> focusLocation;
+  bool hasFocus;
 
   PuzzleData(
       {required this.dim,
       required this.cellSize,
       required this.slideTiles,
-      required this.spaceLocation});
+      required this.spaceLocation,
+      this.hasFocus = false,
+      this.focusLocation = const Point<int>(0, 0)});
 
   factory PuzzleData.blank() {
     return PuzzleData(
@@ -24,7 +28,9 @@ class PuzzleData {
         dim: orig.dim,
         cellSize: orig.cellSize,
         slideTiles: orig.slideTiles,
-        spaceLocation: orig.spaceLocation);
+        spaceLocation: orig.spaceLocation,
+        hasFocus: orig.hasFocus,
+        focusLocation: orig.focusLocation);
   }
 
   factory PuzzleData.dimensioned({required int dim, required double cellSize}) {

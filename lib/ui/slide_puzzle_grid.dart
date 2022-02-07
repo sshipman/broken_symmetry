@@ -1,10 +1,11 @@
 import 'dart:math';
-import 'dart:ui';
 
 import 'package:broken_symmetry/data/puzzle_provider.dart';
 import 'package:broken_symmetry/data/score_provider.dart';
 import 'package:broken_symmetry/models/puzzle_data.dart';
+import 'package:broken_symmetry/ui/focus_reticule.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/slide_tile_data.dart';
@@ -17,6 +18,22 @@ class SlidePuzzleGrid extends ConsumerWidget {
     int cx = (offset.dx / cellSize).floor();
     int cy = (offset.dy / cellSize).floor();
     return Point(cx, cy);
+  }
+
+  void _applyTap(Point<int> tapCell, PuzzleData puzzleData,
+      PuzzleNotifier puzzleNotifier, ScoreNotifier scoreNotifier) {
+    if ((tapCell.x != puzzleData.spaceLocation.x) &&
+        (tapCell.y != puzzleData.spaceLocation.y)) {
+      //if neither col nor row matches, ignore it.
+      return;
+    }
+    List<SlideTileData> tilesToMove = _getMoveCells(tapCell, puzzleData);
+    Point<int> delta = _getDelta(tapCell, puzzleData.spaceLocation);
+    tilesToMove.forEach((SlideTileData element) {
+      element.applyDelta(delta);
+    });
+    puzzleNotifier.setSpaceLocation(tapCell);
+    scoreNotifier.increment();
   }
 
   List<SlideTileData> _getMoveCells(Point<int> tapCell, PuzzleData puzzleData) {
@@ -74,40 +91,74 @@ class SlidePuzzleGrid extends ConsumerWidget {
     PuzzleData puzzleData = ref.watch(puzzleProvider);
     PuzzleNotifier puzzleNotifier = ref.watch(puzzleProvider.notifier);
     ScoreNotifier scoreNotifier = ref.read(scoreProvider.notifier);
-    Point<int> spaceLocation = puzzleData.spaceLocation;
 
-    return Container(
-      alignment: Alignment.center,
-      child: SizedBox(
-        width: 800,
-        height: 800,
-        child: Container(
-          color: Theme.of(context).primaryColor,
-          child: GestureDetector(
-            onTapUp: (TapUpDetails details) {
-              Point<int> tapCell =
-                  _calculateCell(details.localPosition, puzzleData.cellSize);
-              print('${tapCell}');
-              if ((tapCell.x != spaceLocation.x) &&
-                  (tapCell.y != spaceLocation.y)) {
-                //if neither col nor row matches, ignore it.
-                return;
+    List<Widget> children = [
+      ...puzzleData.slideTiles.map(SlideTile.new).toList(),
+      FocusReticule()
+    ];
+
+    return Focus(
+        descendantsAreFocusable: false,
+        onFocusChange: (bool focussed) {
+          puzzleNotifier.setHasFocus(focussed);
+        },
+        onKeyEvent: (FocusNode node, KeyEvent event) {
+          if (event is KeyUpEvent) {
+            Point<int> fl = puzzleData.focusLocation;
+            if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
+              if (fl.x > 0) {
+                puzzleNotifier.setFocusLocation(Point<int>(fl.x - 1, fl.y));
               }
-              List<SlideTileData> tilesToMove =
-                  _getMoveCells(tapCell, puzzleData);
-              Point<int> delta = _getDelta(tapCell, spaceLocation);
-              tilesToMove.forEach((SlideTileData element) {
-                element.applyDelta(delta);
-              });
-              puzzleNotifier.setSpaceLocation(tapCell);
-              scoreNotifier.increment();
-            },
-            child: Stack(
-                alignment: Alignment.topLeft,
-                children: puzzleData.slideTiles.map(SlideTile.new).toList()),
+              return KeyEventResult.handled;
+            }
+            if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
+              if (fl.x < 3) {
+                puzzleNotifier.setFocusLocation(Point<int>(fl.x + 1, fl.y));
+              }
+              return KeyEventResult.handled;
+            }
+            if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+              if (fl.y > 0) {
+                puzzleNotifier.setFocusLocation(Point<int>(fl.x, fl.y - 1));
+              }
+              return KeyEventResult.handled;
+            }
+            if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
+              if (fl.y < 3) {
+                puzzleNotifier.setFocusLocation(Point<int>(fl.x, fl.y + 1));
+              }
+              return KeyEventResult.handled;
+            }
+            if (event.logicalKey == LogicalKeyboardKey.space ||
+                event.logicalKey == LogicalKeyboardKey.enter ||
+                event.logicalKey == LogicalKeyboardKey.numpadEnter) {
+              _applyTap(puzzleData.focusLocation, puzzleData, puzzleNotifier,
+                  scoreNotifier);
+            }
+          }
+          return KeyEventResult.ignored;
+        },
+        child: Container(
+          alignment: Alignment.center,
+          child: SizedBox(
+            width: 800,
+            height: 800,
+            child: Container(
+              color: Theme.of(context).primaryColor,
+              child: GestureDetector(
+                onTapUp: (TapUpDetails details) {
+                  Point<int> tapCell = _calculateCell(
+                      details.localPosition, puzzleData.cellSize);
+                  print('${tapCell}');
+                  _applyTap(tapCell, puzzleData, puzzleNotifier, scoreNotifier);
+                },
+                child: Stack(
+                  alignment: Alignment.topLeft,
+                  children: children,
+                ),
+              ),
+            ),
           ),
-        ),
-      ),
-    );
+        ));
   }
 }

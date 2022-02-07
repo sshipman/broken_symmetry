@@ -29,6 +29,10 @@ class SlideTileData {
     col += delta.x;
   }
 
+  bool atPoint(Point<int> p) {
+    return row == p.y && col == p.x;
+  }
+
   bool get isCorrect {
     return row == solutionRow && col == solutionCol;
   }
