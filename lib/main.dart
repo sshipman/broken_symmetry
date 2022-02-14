@@ -53,17 +53,17 @@ class _BrokenSymmetryState extends ConsumerState<BrokenSymmetry> {
 
   @override
   Widget build(BuildContext context) {
-    PuzzleNotifier puzzleNotifier = ref.read(puzzleProvider.notifier);
-    ScoreNotifier scoreNotifier = ref.read(scoreProvider.notifier);
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
       ),
       body: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
         ScoreDisplay(),
-        SlidePuzzleGrid(),
+        Expanded(child: SlidePuzzleGrid()),
         ElevatedButton(
             onPressed: () {
+              PuzzleNotifier puzzleNotifier = ref.read(puzzleProvider.notifier);
+              ScoreNotifier scoreNotifier = ref.read(scoreProvider.notifier);
               puzzleNotifier.shuffle();
               scoreNotifier.reset();
             },

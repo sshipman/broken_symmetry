@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:broken_symmetry/data/blob_picture_provider.dart';
+import 'package:broken_symmetry/data/size_provider.dart';
 import 'package:broken_symmetry/ui/picture_portion.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,6 +15,7 @@ class Tile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    double unitSize = ref.watch(unitSizeProvider);
     Picture picture = ref.watch(pictureProvider);
     return Container(
       alignment: Alignment.topLeft,
@@ -23,8 +25,8 @@ class Tile extends ConsumerWidget {
         children: [
           PicturePortion(
               picture,
-              Rect.fromLTWH(
-                  data.solutionCol * 200, data.solutionRow * 200, 200, 200)),
+              Rect.fromLTWH(data.solutionCol * unitSize,
+                  data.solutionRow * unitSize, unitSize, unitSize)),
           Text("${data.index}",
               style: TextStyle(fontSize: 16, color: Colors.white))
         ],

@@ -8,12 +8,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../data/size_provider.dart';
 import '../models/slide_tile_data.dart';
 import 'slide_tile.dart';
 
 class SlidePuzzleGrid extends ConsumerWidget {
-  Size size = Size(800, 800);
-
   Point<int> _calculateCell(Offset offset, double cellSize) {
     int cx = (offset.dx / cellSize).floor();
     int cy = (offset.dy / cellSize).floor();
@@ -92,73 +91,87 @@ class SlidePuzzleGrid extends ConsumerWidget {
     PuzzleNotifier puzzleNotifier = ref.watch(puzzleProvider.notifier);
     ScoreNotifier scoreNotifier = ref.read(scoreProvider.notifier);
 
-    List<Widget> children = [
-      ...puzzleData.slideTiles.map(SlideTile.new).toList(),
-      FocusReticule()
-    ];
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        double unitSize = constraints.biggest.shortestSide / 4;
+        double boxSize = unitSize * 4;
+        SizeNotifier sizeNotifier = ref.read(unitSizeProvider.notifier);
+        double existingUnitSize = ref.read(unitSizeProvider);
+        if (unitSize != existingUnitSize) {
+          Future.delayed(Duration.zero, () {
+            sizeNotifier.setUnitSize(unitSize);
+          });
+        }
+        List<Widget> children = [
+          ...puzzleData.slideTiles.map(SlideTile.new).toList(),
+          FocusReticule()
+        ];
 
-    return Focus(
-        descendantsAreFocusable: false,
-        onFocusChange: (bool focussed) {
-          puzzleNotifier.setHasFocus(focussed);
-        },
-        onKeyEvent: (FocusNode node, KeyEvent event) {
-          if (event is KeyUpEvent) {
-            Point<int> fl = puzzleData.focusLocation;
-            if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
-              if (fl.x > 0) {
-                puzzleNotifier.setFocusLocation(Point<int>(fl.x - 1, fl.y));
+        return Focus(
+            descendantsAreFocusable: false,
+            onFocusChange: (bool focussed) {
+              puzzleNotifier.setHasFocus(focussed);
+            },
+            onKeyEvent: (FocusNode node, KeyEvent event) {
+              if (event is KeyUpEvent) {
+                Point<int> fl = puzzleData.focusLocation;
+                if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
+                  if (fl.x > 0) {
+                    puzzleNotifier.setFocusLocation(Point<int>(fl.x - 1, fl.y));
+                  }
+                  return KeyEventResult.handled;
+                }
+                if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
+                  if (fl.x < 3) {
+                    puzzleNotifier.setFocusLocation(Point<int>(fl.x + 1, fl.y));
+                  }
+                  return KeyEventResult.handled;
+                }
+                if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+                  if (fl.y > 0) {
+                    puzzleNotifier.setFocusLocation(Point<int>(fl.x, fl.y - 1));
+                  }
+                  return KeyEventResult.handled;
+                }
+                if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
+                  if (fl.y < 3) {
+                    puzzleNotifier.setFocusLocation(Point<int>(fl.x, fl.y + 1));
+                  }
+                  return KeyEventResult.handled;
+                }
+                if (event.logicalKey == LogicalKeyboardKey.space ||
+                    event.logicalKey == LogicalKeyboardKey.enter ||
+                    event.logicalKey == LogicalKeyboardKey.numpadEnter) {
+                  _applyTap(puzzleData.focusLocation, puzzleData,
+                      puzzleNotifier, scoreNotifier);
+                }
               }
-              return KeyEventResult.handled;
-            }
-            if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
-              if (fl.x < 3) {
-                puzzleNotifier.setFocusLocation(Point<int>(fl.x + 1, fl.y));
-              }
-              return KeyEventResult.handled;
-            }
-            if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
-              if (fl.y > 0) {
-                puzzleNotifier.setFocusLocation(Point<int>(fl.x, fl.y - 1));
-              }
-              return KeyEventResult.handled;
-            }
-            if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
-              if (fl.y < 3) {
-                puzzleNotifier.setFocusLocation(Point<int>(fl.x, fl.y + 1));
-              }
-              return KeyEventResult.handled;
-            }
-            if (event.logicalKey == LogicalKeyboardKey.space ||
-                event.logicalKey == LogicalKeyboardKey.enter ||
-                event.logicalKey == LogicalKeyboardKey.numpadEnter) {
-              _applyTap(puzzleData.focusLocation, puzzleData, puzzleNotifier,
-                  scoreNotifier);
-            }
-          }
-          return KeyEventResult.ignored;
-        },
-        child: Container(
-          alignment: Alignment.center,
-          child: SizedBox(
-            width: 800,
-            height: 800,
+              return KeyEventResult.ignored;
+            },
             child: Container(
-              color: Theme.of(context).primaryColor,
-              child: GestureDetector(
-                onTapUp: (TapUpDetails details) {
-                  Point<int> tapCell = _calculateCell(
-                      details.localPosition, puzzleData.cellSize);
-                  print('${tapCell}');
-                  _applyTap(tapCell, puzzleData, puzzleNotifier, scoreNotifier);
-                },
-                child: Stack(
-                  alignment: Alignment.topLeft,
-                  children: children,
+              alignment: Alignment.center,
+              child: SizedBox(
+                width: boxSize,
+                height: boxSize,
+                child: Container(
+                  color: Theme.of(context).primaryColor,
+                  child: GestureDetector(
+                    onTapUp: (TapUpDetails details) {
+                      Point<int> tapCell = _calculateCell(
+                          details.localPosition, puzzleData.cellSize);
+                      print('${tapCell}');
+                      _applyTap(
+                          tapCell, puzzleData, puzzleNotifier, scoreNotifier);
+                    },
+                    child: Stack(
+                      alignment: Alignment.topLeft,
+                      children: children,
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
-        ));
+            ));
+      },
+    );
   }
 }

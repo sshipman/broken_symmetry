@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:broken_symmetry/data/size_provider.dart';
 import 'package:broken_symmetry/models/puzzle_data.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -38,5 +39,6 @@ class PuzzleNotifier extends StateNotifier<PuzzleData> {
 }
 
 final puzzleProvider = StateNotifierProvider<PuzzleNotifier, PuzzleData>((ref) {
-  return PuzzleNotifier(dim: 4, cellSize: 200);
+  double unitSize = ref.watch(unitSizeProvider);
+  return PuzzleNotifier(dim: 4, cellSize: unitSize);
 });
