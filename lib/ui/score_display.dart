@@ -7,6 +7,8 @@ class ScoreDisplay extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     int moves = ref.watch(scoreProvider);
-    return Text("Moves: $moves");
+    return Center(
+        heightFactor: 3,
+        child: Text("Moves: $moves", style: TextStyle(fontSize: 36)));
   }
 }

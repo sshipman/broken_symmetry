@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'control_point.dart';
 
 Paint _paint = Paint()
-  ..color = const Color(0x88888888)
+  ..color = const Color(0x88000000)
   ..style = PaintingStyle.fill;
 
 class Blob {

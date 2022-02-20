@@ -27,7 +27,14 @@ class Tile extends ConsumerWidget {
               picture,
               Rect.fromLTWH(data.solutionCol * unitSize,
                   data.solutionRow * unitSize, unitSize, unitSize)),
-          Text("${data.index}",
+          Text(" ${data.index}",
+              style: TextStyle(
+                  fontSize: 16,
+                  foreground: Paint()
+                    ..style = PaintingStyle.stroke
+                    ..strokeWidth = 3
+                    ..color = Colors.black)),
+          Text(" ${data.index}",
               style: TextStyle(fontSize: 16, color: Colors.white))
         ],
       ),
