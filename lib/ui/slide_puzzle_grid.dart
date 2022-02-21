@@ -1,14 +1,17 @@
 import 'dart:math';
 
+import 'package:broken_symmetry/data/prefs_provider.dart';
 import 'package:broken_symmetry/data/puzzle_provider.dart';
 import 'package:broken_symmetry/data/score_provider.dart';
 import 'package:broken_symmetry/models/puzzle_data.dart';
 import 'package:broken_symmetry/ui/focus_reticule.dart';
+import 'package:broken_symmetry/utils/sound.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/size_provider.dart';
+import '../models/preferences.dart';
 import '../models/slide_tile_data.dart';
 import 'slide_tile.dart';
 
@@ -19,12 +22,19 @@ class SlidePuzzleGrid extends ConsumerWidget {
     return Point(cx, cy);
   }
 
-  void _applyTap(Point<int> tapCell, PuzzleData puzzleData,
-      PuzzleNotifier puzzleNotifier, ScoreNotifier scoreNotifier) {
+  void _applyTap(
+      Point<int> tapCell,
+      PuzzleData puzzleData,
+      PuzzleNotifier puzzleNotifier,
+      ScoreNotifier scoreNotifier,
+      Preferences prefs) {
     if ((tapCell.x != puzzleData.spaceLocation.x) &&
         (tapCell.y != puzzleData.spaceLocation.y)) {
       //if neither col nor row matches, ignore it.
       return;
+    }
+    if (prefs.playSounds) {
+      playTileMove();
     }
     List<SlideTileData> tilesToMove = _getMoveCells(tapCell, puzzleData);
     Point<int> delta = _getDelta(tapCell, puzzleData.spaceLocation);
@@ -33,6 +43,7 @@ class SlidePuzzleGrid extends ConsumerWidget {
     });
     puzzleNotifier.setSpaceLocation(tapCell);
     scoreNotifier.increment();
+    _checkSolution(puzzleData);
   }
 
   List<SlideTileData> _getMoveCells(Point<int> tapCell, PuzzleData puzzleData) {
@@ -80,8 +91,6 @@ class SlidePuzzleGrid extends ConsumerWidget {
     if (puzzleData.slideTiles
         .every((SlideTileData element) => element.isCorrect)) {
       print("yay!");
-    } else {
-      print("nope.");
     }
   }
 
@@ -90,6 +99,7 @@ class SlidePuzzleGrid extends ConsumerWidget {
     PuzzleData puzzleData = ref.watch(puzzleProvider);
     PuzzleNotifier puzzleNotifier = ref.watch(puzzleProvider.notifier);
     ScoreNotifier scoreNotifier = ref.read(scoreProvider.notifier);
+    Preferences prefs = ref.watch(prefsProvider);
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
@@ -143,7 +153,7 @@ class SlidePuzzleGrid extends ConsumerWidget {
                     event.logicalKey == LogicalKeyboardKey.enter ||
                     event.logicalKey == LogicalKeyboardKey.numpadEnter) {
                   _applyTap(puzzleData.focusLocation, puzzleData,
-                      puzzleNotifier, scoreNotifier);
+                      puzzleNotifier, scoreNotifier, prefs);
                 }
               }
               return KeyEventResult.ignored;
@@ -160,8 +170,8 @@ class SlidePuzzleGrid extends ConsumerWidget {
                       Point<int> tapCell = _calculateCell(
                           details.localPosition, puzzleData.cellSize);
                       print('${tapCell}');
-                      _applyTap(
-                          tapCell, puzzleData, puzzleNotifier, scoreNotifier);
+                      _applyTap(tapCell, puzzleData, puzzleNotifier,
+                          scoreNotifier, prefs);
                     },
                     child: Stack(
                       alignment: Alignment.topLeft,

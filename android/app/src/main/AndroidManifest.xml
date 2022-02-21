@@ -1,5 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="wtf.flax.broken_symmetry">
+    <uses-permission android:name="android.permission.INTERNET" />
    <application
         android:label="broken_symmetry"
         android:name="${applicationName}"

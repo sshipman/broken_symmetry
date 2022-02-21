@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:broken_symmetry/data/background_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -34,9 +35,14 @@ class _GamePageState extends ConsumerState<GamePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
+      appBar: AppBar(title: Text(widget.title), actions: [
+        IconButton(
+            icon: const Icon(Icons.settings),
+            tooltip: 'Settings',
+            onPressed: () {
+              Navigator.pushNamed(context, '/settings');
+            }),
+      ]),
       body: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
         ScoreDisplay(),
         Expanded(child: SlidePuzzleGrid()),
@@ -49,8 +55,9 @@ class _GamePageState extends ConsumerState<GamePage> {
                 ScoreNotifier scoreNotifier = ref.read(scoreProvider.notifier);
                 puzzleNotifier.shuffle();
                 scoreNotifier.reset();
+                initBackground();
               },
-              child: Text("Shuffle")),
+              child: Text("Restart")),
         )
       ]),
     );

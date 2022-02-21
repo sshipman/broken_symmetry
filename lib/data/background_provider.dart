@@ -15,7 +15,7 @@ List<String> backgrounds = [
   'https://flax.wtf/broken_symmetry/dino_bike.jpg',
   'https://flax.wtf/broken_symmetry/forest.jpg',
   'https://flax.wtf/broken_symmetry/hallway.jpg',
-  'https://flax.wtf/broken_symmetry/phatom_lake.jpg',
+  'https://flax.wtf/broken_symmetry/phantom_lake.jpg',
   'https://flax.wtf/broken_symmetry/spider_bg.jpg',
 ];
 Future<Image> _getImage() async {
