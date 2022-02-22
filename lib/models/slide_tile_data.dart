@@ -6,21 +6,19 @@ class SlideTileData {
   int row;
   int col;
   int index;
-  double size;
 
-  SlideTileData(
-      {required this.row,
-      required this.col,
-      required this.index,
-      required this.size})
-      : solutionRow = row,
+  SlideTileData({
+    required this.row,
+    required this.col,
+    required this.index,
+  })  : solutionRow = row,
         solutionCol = col;
 
-  double calculateLeft() {
+  double calculateLeft(double size) {
     return col * size;
   }
 
-  double calculateTop() {
+  double calculateTop(double size) {
     return row * size;
   }
 

@@ -19,8 +19,8 @@ class Tile extends ConsumerWidget {
     Picture picture = ref.watch(pictureProvider);
     return Container(
       alignment: Alignment.topLeft,
-      width: data.size,
-      height: data.size,
+      width: unitSize,
+      height: unitSize,
       child: Stack(
         children: [
           PicturePortion(

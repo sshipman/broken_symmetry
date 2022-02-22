@@ -30,15 +30,12 @@ class Splash extends ConsumerWidget {
                 FractionallySizedBox(
                     widthFactor: 0.33,
                     child: ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
+                          await showWaiver(context);
+                          PuzzleNotifier puzzleNotifier =
+                              ref.read(puzzleProvider.notifier);
+                          puzzleNotifier.shuffle();
                           Navigator.of(context).pushNamed("/game");
-                          Future.delayed(Duration(milliseconds: 500)).then((_) {
-                            showWaiver(context);
-                          }).then((_) {
-                            PuzzleNotifier puzzleNotifier =
-                                ref.read(puzzleProvider.notifier);
-                            puzzleNotifier.shuffle();
-                          });
                         },
                         child: Text("Begin")))
               ],

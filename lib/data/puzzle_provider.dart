@@ -1,15 +1,12 @@
 import 'dart:math';
 
-import 'package:broken_symmetry/data/size_provider.dart';
 import 'package:broken_symmetry/models/puzzle_data.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class PuzzleNotifier extends StateNotifier<PuzzleData> {
   int dim;
-  double cellSize;
 
-  PuzzleNotifier({required this.dim, required this.cellSize})
-      : super(PuzzleData.dimensioned(dim: dim, cellSize: cellSize));
+  PuzzleNotifier({required this.dim}) : super(PuzzleData.dimensioned(dim: dim));
 
   void forceUpdate() {
     state = PuzzleData.copy(state);
@@ -33,12 +30,10 @@ class PuzzleNotifier extends StateNotifier<PuzzleData> {
 
   void shuffle() {
     state.shuffle();
-    state.spaceLocation = Point(dim - 1, dim - 1);
     forceUpdate();
   }
 }
 
 final puzzleProvider = StateNotifierProvider<PuzzleNotifier, PuzzleData>((ref) {
-  double unitSize = ref.watch(unitSizeProvider);
-  return PuzzleNotifier(dim: 4, cellSize: unitSize);
+  return PuzzleNotifier(dim: 4);
 });
