@@ -25,6 +25,10 @@ class ControlPoint {
         (_random.nextDouble() * _vinit) - (_vinit / 2));
   }
 
+  ControlPoint clone() {
+    return ControlPoint(this.x, this.y, this.vx, this.vy);
+  }
+
   Point<double> midPoint(ControlPoint other) {
     return Point<double>((x + other.x) / 2, (y + other.y) / 2);
   }

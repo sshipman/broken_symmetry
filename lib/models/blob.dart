@@ -16,9 +16,17 @@ Paint _paint = Paint()
 class Blob {
   late List<ControlPoint> controlPoints;
 
-  Blob({int numPoints = 4}) {
+  Blob(this.controlPoints);
+
+  Blob.generate({int numPoints = 4}) {
     controlPoints = List<ControlPoint>.generate(
         numPoints, (index) => ControlPoint.random());
+  }
+
+  Blob clone() {
+    return Blob(this.controlPoints.map((ControlPoint cp) {
+      return cp.clone();
+    }).toList());
   }
 
   void tick() {

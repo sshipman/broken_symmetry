@@ -13,5 +13,5 @@ class BlobsNotifier extends StateNotifier<List<Blob>> {
 }
 
 final blobsProvider = StateNotifierProvider<BlobsNotifier, List<Blob>>((ref) {
-  return BlobsNotifier([Blob(), Blob()]);
+  return BlobsNotifier([Blob.generate(), Blob.generate()]);
 });

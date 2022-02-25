@@ -20,7 +20,7 @@ class Waiver extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text("Thank you for participating in our research study.\n"
         "Please relax and let your mind wander while you solve the puzzle.\n"
-        "We cannot take responsibility for any psychosis, discovered or induced,\n"
+        "We cannot take responsibility for any psychosis discovered, or induced,\n"
         "by this exercise.");
   }
 }
