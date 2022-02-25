@@ -52,8 +52,8 @@ class _GamePageState extends ConsumerState<GamePage> {
               onPressed: () {
                 PuzzleNotifier puzzleNotifier =
                     ref.read(puzzleProvider.notifier);
-                ScoreNotifier scoreNotifier = ref.read(scoreProvider.notifier);
                 puzzleNotifier.shuffle();
+                ScoreNotifier scoreNotifier = ref.read(scoreProvider.notifier);
                 scoreNotifier.reset();
                 initBackground();
               },

@@ -7,6 +7,7 @@ import 'package:broken_symmetry/models/puzzle_data.dart';
 import 'package:broken_symmetry/ui/focus_reticule.dart';
 import 'package:broken_symmetry/utils/sound.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -89,7 +90,6 @@ class SlidePuzzleGrid extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    double unitSize = ref.watch(unitSizeProvider);
     PuzzleData puzzleData = ref.watch(puzzleProvider);
     PuzzleNotifier puzzleNotifier = ref.watch(puzzleProvider.notifier);
     ScoreNotifier scoreNotifier = ref.read(scoreProvider.notifier);
@@ -102,7 +102,7 @@ class SlidePuzzleGrid extends ConsumerWidget {
         SizeNotifier sizeNotifier = ref.read(unitSizeProvider.notifier);
         double existingUnitSize = ref.read(unitSizeProvider);
         if (unitSize != existingUnitSize) {
-          Future.delayed(Duration.zero, () {
+          SchedulerBinding.instance?.addPostFrameCallback((_) {
             sizeNotifier.setUnitSize(unitSize);
           });
         }
