@@ -8,6 +8,7 @@ import '../data/blobs_provider.dart';
 import '../data/puzzle_provider.dart';
 import '../data/score_provider.dart';
 import 'score_display.dart';
+import 'size_watcher_container.dart';
 import 'slide_puzzle_grid.dart';
 
 class GamePage extends ConsumerStatefulWidget {
@@ -45,7 +46,7 @@ class _GamePageState extends ConsumerState<GamePage> {
       ]),
       body: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
         ScoreDisplay(),
-        Expanded(child: SlidePuzzleGrid()),
+        Expanded(child: SizeWatcherContainer(child: SlidePuzzleGrid())),
         Center(
           heightFactor: 3,
           child: ElevatedButton(
