@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:broken_symmetry/data/game_status_provider.dart';
 import 'package:broken_symmetry/data/prefs_provider.dart';
 import 'package:broken_symmetry/data/puzzle_provider.dart';
 import 'package:broken_symmetry/data/score_provider.dart';
@@ -11,8 +12,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../data/size_provider.dart';
+import '../models/game_status.dart';
 import '../models/preferences.dart';
 import '../models/slide_tile_data.dart';
+import '../utils/constants.dart';
+import 'insane_stamp.dart';
 import 'sane_stamp.dart';
 import 'slide_tile.dart';
 
@@ -28,7 +32,11 @@ class SlidePuzzleGrid extends ConsumerWidget {
       PuzzleData puzzleData,
       PuzzleNotifier puzzleNotifier,
       ScoreNotifier scoreNotifier,
+      GameStatus gameStatus,
       Preferences prefs) {
+    if (gameStatus != GameStatus.ACTIVE) {
+      return;
+    }
     if ((tapCell.x != puzzleData.spaceLocation.x) &&
         (tapCell.y != puzzleData.spaceLocation.y)) {
       //if neither col nor row matches, ignore it.
@@ -94,6 +102,9 @@ class SlidePuzzleGrid extends ConsumerWidget {
     ScoreNotifier scoreNotifier = ref.read(scoreProvider.notifier);
     Preferences prefs = ref.watch(prefsProvider);
     double unitSize = ref.watch(unitSizeProvider);
+    GameStatus gameStatus = ref.watch(gameStatusProvider);
+    GameStatusNotifier gameStatusNotifier =
+        ref.read(gameStatusProvider.notifier);
 
     List<Widget> children = [
       ...puzzleData.slideTiles.map(SlideTile.new).toList(),
@@ -137,7 +148,7 @@ class SlidePuzzleGrid extends ConsumerWidget {
                   event.logicalKey == LogicalKeyboardKey.enter ||
                   event.logicalKey == LogicalKeyboardKey.numpadEnter) {
                 _applyTap(puzzleData.focusLocation, puzzleData, puzzleNotifier,
-                    scoreNotifier, prefs);
+                    scoreNotifier, gameStatus, prefs);
               }
             }
             return KeyEventResult.ignored;
@@ -154,7 +165,7 @@ class SlidePuzzleGrid extends ConsumerWidget {
                     Point<int> tapCell =
                         _calculateCell(details.localPosition, unitSize);
                     _applyTap(tapCell, puzzleData, puzzleNotifier,
-                        scoreNotifier, prefs);
+                        scoreNotifier, gameStatus, prefs);
                   },
                   child: Stack(
                     alignment: Alignment.topLeft,
@@ -167,6 +178,15 @@ class SlidePuzzleGrid extends ConsumerWidget {
     ];
     if (puzzleData.isCorrect && scoreNotifier.state > 0) {
       stackChildren.add(Center(child: SaneStamp()));
+      WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+        gameStatusNotifier.finish();
+      });
+    }
+    if (!puzzleData.isCorrect && scoreNotifier.state >= movesLimit) {
+      stackChildren.add(Center(child: InsaneStamp()));
+      WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
+        gameStatusNotifier.finish();
+      });
     }
 
     return Stack(

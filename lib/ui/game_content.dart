@@ -1,4 +1,5 @@
 import 'package:broken_symmetry/data/evaluations_provider.dart';
+import 'package:broken_symmetry/data/game_status_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -24,6 +25,9 @@ class GameContent extends ConsumerWidget {
               puzzleNotifier.shuffle();
               ScoreNotifier scoreNotifier = ref.read(scoreProvider.notifier);
               scoreNotifier.reset();
+              GameStatusNotifier gameStatusNotifier =
+                  ref.read(gameStatusProvider.notifier);
+              gameStatusNotifier.reset();
               EvaluationsNotifier evaluationsNotifier =
                   ref.read(evaluationsProvider.notifier);
               evaluationsNotifier.reset();
