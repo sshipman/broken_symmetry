@@ -2,7 +2,6 @@ import 'package:broken_symmetry/data/blobs_provider.dart';
 import 'package:broken_symmetry/data/evaluations_provider.dart';
 import 'package:broken_symmetry/utils/random_source.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/blob.dart';
@@ -31,6 +30,8 @@ List<String> _responses = [
 ];
 
 class InkblotPopup extends ConsumerStatefulWidget {
+  const InkblotPopup({Key? key}) : super(key: key);
+
   @override
   ConsumerState<ConsumerStatefulWidget> createState() {
     return _InkblotPopupState();
@@ -94,25 +95,25 @@ class _InkblotPopupState extends ConsumerState<InkblotPopup> {
               ),
               Row(children: [
                 InkblotImage(blobs, Size(size, size)),
-                Container(
+                SizedBox(
                   width: size,
                   child: Column(
                     children: [
-                      Text("What do you see?"),
+                      const Text("What do you see?"),
                       AnimatedOpacity(
                           opacity: response.isEmpty ? 0 : 1,
                           duration: const Duration(milliseconds: 500),
                           child: Text(response,
-                              style: TextStyle(color: Colors.green)))
+                              style: const TextStyle(color: Colors.green)))
                     ],
                   ),
                 )
               ]),
-              SizedBox(height: 5),
+              const SizedBox(height: 5),
               TextField(
                   autofocus: true,
                   controller: controller,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: "It looks like...",
                   ),
@@ -151,7 +152,7 @@ Future<String?> showInkblotPopup(
   return showDialog<String?>(
       context: context,
       builder: (BuildContext context) {
-        return InkblotPopup();
+        return const InkblotPopup();
       },
       barrierDismissible: false);
 }
